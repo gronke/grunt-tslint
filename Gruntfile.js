@@ -20,6 +20,7 @@ module.exports = function(grunt) {
 
   grunt.loadNpmTasks("grunt-contrib-jshint");
   grunt.loadNpmTasks("grunt-contrib-clean");
+  grunt.loadNpmTasks('grunt-mocha-test');
 
   grunt.initConfig({
     jshint: {
@@ -44,13 +45,24 @@ module.exports = function(grunt) {
             "test/fixtures/errorFile2.ts"
         ]}
       }
+    },
+
+    mochaTest: {
+      test: {
+        options: {
+          reporter: 'spec',
+          quiet: false,
+          log: true
+        },
+        src: ["test/tasks/**/*.js"]
+      }
     }
   });
 
   // actually load this plugin's task(s)
   grunt.loadTasks("tasks");
 
-  grunt.registerTask("test", ["tslint"]);
+  grunt.registerTask("test", ["tslint", "mochaTest"]);
 
   // by default, lint and run all tests
   grunt.registerTask("default", ["jshint", "test"]);
