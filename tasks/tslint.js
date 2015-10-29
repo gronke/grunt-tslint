@@ -29,6 +29,9 @@ module.exports = function(grunt) {
     var done = this.async();
     var failed = 0;
 
+    var outputFile = options.outputFile;
+    var appendToOutput = options.appendToOutput;
+
     // Iterate over all specified file groups, async for 'streaming' output on large projects
     grunt.util.async.reduce(this.filesSrc, true, function(success, filepath, callback) {
       if (!grunt.file.exists(filepath)) {
@@ -41,8 +44,6 @@ module.exports = function(grunt) {
 
         if(result.failureCount > 0) {
           var outputString = "";
-          var outputFile = options.outputFile;
-          var appendToOutput = options.appendToOutput;
 
           failed += result.failureCount;
 
@@ -64,6 +65,7 @@ module.exports = function(grunt) {
           });
           if(outputFile != null) {
             grunt.file.write(outputFile, outputString);
+            appendToOutput = true;
           }
           success = false;
         }
