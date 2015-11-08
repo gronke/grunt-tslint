@@ -24,10 +24,15 @@ module.exports = function(grunt) {
     var options = this.options({
       formatter: "prose",
       outputFile: null,
-      appendToOutput: false
+      outputReport: null,
+      appendToOutput: false,
+      force: false
     });
     var done = this.async();
+    var force = options.force;
     var failed = 0;
+    var files = this.filesSrc;
+    var results = [];
 
     var outputFile = options.outputFile;
     var appendToOutput = options.appendToOutput;
@@ -56,6 +61,7 @@ module.exports = function(grunt) {
           }
           result.output.split("\n").forEach(function(line) {
             if(line !== "") {
+              results = results.concat((options.formatter.toLowerCase() === 'json') ? JSON.parse(line) : line);
               if (outputFile != null) {
                 outputString += line + "\n";
               } else {
@@ -81,12 +87,25 @@ module.exports = function(grunt) {
         } else if (!success) {
             grunt.log.error(failed + " " + grunt.util.pluralize(failed,"error/errors") + " in " +
                             this.filesSrc.length + " " + grunt.util.pluralize(this.filesSrc.length,"file/files"));
-            done(false);
+
+            report();
+            done(force);
         } else {
             grunt.log.ok(this.filesSrc.length + " " + grunt.util.pluralize(this.filesSrc.length,"file/files") + " lint free.");
+            report();
             done();
         }
     }.bind(this));
+
+    function report() {
+      if(options.outputReport) {
+        grunt.config(['tslint', 'reports', options.outputReport.toString()], {
+          failed: failed,
+          files: files,
+          results: results
+        });
+      }
+    }
   });
 
 };
